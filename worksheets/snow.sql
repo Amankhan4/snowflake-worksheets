@@ -1,59 +1,62 @@
-Create warehouse AWS_WH;
-create database DBT_DB;
-create schema DBT_DB.Try;
+Sure, here is your SQL script formatted and cleaned up for better readability:
 
----  -----  ----   -----
+```sql
+-- Create a warehouse
+CREATE WAREHOUSE AWS_WH;
 
--- Create storage object this will help us to connect to aws.
+-- Create a database and schema
+CREATE DATABASE DBT_DB;
+CREATE SCHEMA DBT_DB.Try;
 
-create or replace storage integration Snow_OBJ
-type = external_stage
-storage_provider = s3
-enabled = True
-storage_aws_role_arn = 'arn:aws:iam::390844748718:role/Data-transfer-role'
-storage_allowed_locations = ('s3://snowflake-datetransfer/');
+-- Create storage integration to connect to AWS
+CREATE OR REPLACE STORAGE INTEGRATION Snow_OBJ
+    TYPE = external_stage
+    STORAGE_PROVIDER = s3
+    ENABLED = TRUE
+    STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::390844748718:role/Data-transfer-role'
+    STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-datetransfer/');
 
-desc integration Snow_OBJ;
+DESC INTEGRATION Snow_OBJ;
 
--- Create a File Formate
+-- Create a file format for CSV files
+CREATE OR REPLACE FILE FORMAT csv_format
+    TYPE = csv
+    FIELD_DELIMITER = ','
+    SKIP_HEADER = 1
+    NULL_IF = ('NULL', 'null')
+    EMPTY_FIELD_AS_NULL = TRUE;
 
-create or replace file format csv_format type = csv field_delimiter ="," skip_header = 1 null_if = ('NULL','null') empty_field_as_null = true;
+-- Create a stage specifying where data files are stored
+CREATE OR REPLACE STAGE snow_stage_2024
+    STORAGE_INTEGRATION = Snow_OBJ
+    URL = 's3://snowflake-datetransfer/'
+    FILE_FORMAT = csv_format;
 
--- Create a stage. A stage specifies where data file are stored so that data in file can be loaded into an table.
+-- Create a table to store the data
+CREATE OR REPLACE TABLE data (
+    Duration INT,
+    Date VARCHAR(20),
+    Pulse INT,
+    Maxpulse INT,
+    Calories INT
+);
 
-create or replace stage snow_stage_2024
-storage_integration = Snow_OBJ
-url = 's3://snowflake-datetransfer/'
-file_format = csv_format;
+-- Copy data into the table
+COPY INTO data
+FROM @snow_stage_2024
+ON_ERROR = 'skip_file';
 
--- Create a table to storethe data 
+-- Select all data from the table
+SELECT * FROM try.data;
 
-create or replace table data
-(
-    Duration int,
-    Date varchar(20),
-    Pulse int,
-    Maxpulse int,
-    Calories int
-)
-
--- Copy into table
-
-copy into data from @snow_stage_2024
-ON_ERROR ='skip_file';
-
-select * from try.data;
-
--- Cleaning and setting proper data type to the date column as it incudes strings.
-alter table data add column new_date date;
+-- Cleaning and setting proper data type for the date column
+ALTER TABLE data ADD COLUMN new_date DATE;
 
 UPDATE try.data
-SET new_date = TRY_TO_DATE(REPLACE(date, '''', ''), 'YYYY/MM/DD');
+SET new_date = TRY_TO_DATE(REPLACE(Date, '''', ''), 'YYYY/MM/DD');
 
-alter table data drop column date;
+ALTER TABLE data DROP COLUMN Date;
+ALTER TABLE data RENAME COLUMN new_date TO Date;
+```
 
-alter table data rename column new_date to date;
-
-
-
-
+This should improve the readability and maintainability of your SQL script.
