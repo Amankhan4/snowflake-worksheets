@@ -20,6 +20,11 @@ This repository contains SQL worksheets and scripts for working with Snowflake, 
 
 To get started with the worksheets in this repository, follow these steps:
 
+## usage 
+
+Each SQL worksheet is designed to demonstrate specific functionalities or queries in Snowflake. You can run the scripts directly in your Snowflake environment. Make sure to adjust any database, schema, or table names as necessary to fit your environment.
+
+
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/Amankhan4/snowflake-worksheets.git
