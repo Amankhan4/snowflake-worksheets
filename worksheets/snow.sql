@@ -1,6 +1,3 @@
-Sure, here is your SQL script formatted and cleaned up for better readability:
-
-```sql
 -- Create a warehouse
 CREATE WAREHOUSE AWS_WH;
 
@@ -57,6 +54,4 @@ SET new_date = TRY_TO_DATE(REPLACE(Date, '''', ''), 'YYYY/MM/DD');
 
 ALTER TABLE data DROP COLUMN Date;
 ALTER TABLE data RENAME COLUMN new_date TO Date;
-```
 
-This should improve the readability and maintainability of your SQL script.
